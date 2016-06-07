@@ -2,14 +2,9 @@ require "domain_mapped_attribute/version"
 
 module DomainMappedAttribute
   autoload :BeforeValidator, "domain_mapped_attribute/before_validator"
+  autoload :DomainMapper, "domain_mapped_attribute/domain_mapper"
   autoload :DomainPresenceValidator, "domain_mapped_attribute/domain_presence_validator"
-  autoload :ResolveMethods, "domain_mapped_attribute/resolve_methods"
   autoload :Resolver, "domain_mapped_attribute/resolver"
-
-  mattr_accessor :config
-  self.config = {
-    resolver_class: DomainMappedAttribute::Resolver
-  }
 
   extend ActiveSupport::Concern
 
@@ -40,17 +35,23 @@ module DomainMappedAttribute
     end
 
     def domain_mappable(name_field, options = {})
-      cattr_accessor :domain_mapped_resolver_field
-      cattr_accessor :domain_mapped_options
-      self.domain_mapped_resolver_field = name_field
-      self.domain_mapped_options = options
+      cattr_accessor :domain_mapper
+      self.domain_mapper = DomainMapper.new(name_field, options.merge(klass: self))
 
-      extend DomainMappedAttribute::ResolveMethods
+      class << self
+        delegate :resolve, to: :domain_mapper
+
+        def unknown_domain_id
+          const_defined?(:UNKNOWN) ? const_get(:UNKNOWN) : nil
+        end
+
+        def unknown_domain_value?(value)
+          unknown_domain_id == value
+        end
+      end
+
     end
 
-    def domain_mapped_attributes
-      @domain_mapped_attributes ||= {}
-    end
   end
 end
 
