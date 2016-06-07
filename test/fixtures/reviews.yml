@@ -1,0 +1,10 @@
+mapped_with_string:
+  title: "This is a mapped review"
+  body: "Blah Blah"
+  restaurant_name: "Some string"
+  restaurant: bk
+
+mapped_without_string:
+  title: "This is another mapped review"
+  body: "Foo foo"
+  restaurant: bk

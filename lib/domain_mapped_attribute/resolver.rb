@@ -15,7 +15,7 @@ module DomainMappedAttribute
       if matches.length > 0
         return matches[0].id
       else
-        return @klass.const_get(:UNKNOWN)
+        return @klass.unknown_domain_id
       end
     end
   end

@@ -1,0 +1,13 @@
+---
+unknown:
+  id: 1
+  name: Unknown
+
+mcd:
+  name: McDonald's
+
+bk:
+  name: Burger King
+
+subway:
+  name: Subway

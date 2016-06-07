@@ -1,7 +1,7 @@
 class CreateReviews < ActiveRecord::Migration
   def change
 
-    create_table :restarants do |t|
+    create_table :restaurants do |t|
       t.string :name
       t.timestamps null: false
     end

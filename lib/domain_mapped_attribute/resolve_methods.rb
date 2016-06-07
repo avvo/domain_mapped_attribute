@@ -17,6 +17,15 @@ module DomainMappedAttribute
     def resolve(name, options = {})
       self.domain_mapped_resolver.resolve(name, options)
     end
+
+    def unknown_domain_id
+      const_defined?(:UNKNOWN) ? const_get(:UNKNOWN) : nil
+    end
+
+    def unknown_domain_value?(value)
+      unknown_domain_id == value
+    end
+
   end
 
 end

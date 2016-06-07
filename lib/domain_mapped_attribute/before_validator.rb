@@ -1,30 +1,48 @@
 module DomainMappedAttribute
 
   class BeforeValidator
-    def initialize(options = {})
-      @klass = options[:klass]
-      @name_field = options[:name_field]
-      @object_id_field = options[:object_id_field]
-      @unknown_id = @klass.const_get(:UNKNOWN)
+    attr_reader :name_field, :id_field
+
+    def initialize(association_name, association_klass)
+      @klass = association_klass
+      @name_field = "#{association_name}_name"
+      @id_field = "#{association_name}_id"
     end
 
-    def before_validation(model)
-      # make sure we're set to unknown initially if it's not set (could be nil or 0)
-      unless @klass.id_set_and_not_unknown(model.send(@object_id_field))
-        model.send("#{@object_id_field}=", @unknown_id)
-      end
-
-      # set the id to unknown if the name has changed to something other than nil -- this will force a resolve
-      if model.changed.include?(@name_field) && model.attribute_present?(@name_field)
-        model.send("#{@object_id_field}=", @unknown_id)
-      end
+    def before_validation(record)
+      reset_id_field(record) if should_reset?(record)
 
       # if the id is unknown and we have a name, try to resolve it...
-      if model.read_attribute(@object_id_field) == @unknown_id && model.attribute_present?(@name_field)
-        resolved_id = @klass.resolve(model.read_attribute(@name_field), model.resolve_options)
-        model.send("#{@object_id_field}=", resolved_id) if resolved_id.present?
-      end
+      return unless should_resolve?(record)
+
+      resolved_id = @klass.resolve(record.read_attribute(name_field), record.resolve_options)
+      set_id(record, resolved_id) if resolved_id.present?
     end
+
+    protected
+
+    def should_reset?(record)
+      # if the id is already set
+      return true unless record.attribute_present?(id_field)
+
+      # name was changed to something other than nil
+      record.changed.include?(name_field) &&
+        record.attribute_present?(name_field)
+    end
+
+    def should_resolve?(record)
+      @klass.unknown_domain_value?(record.read_attribute(id_field)) &&
+        record.attribute_present?(name_field)
+    end
+
+    def reset_id_field(record)
+      set_id(record, @klass.unknown_domain_id)
+    end
+
+    def set_id(record, value)
+      record.send("#{id_field}=", value)
+    end
+
   end
 
 end
