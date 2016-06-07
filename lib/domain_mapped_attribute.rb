@@ -13,12 +13,13 @@ module DomainMappedAttribute
   end
 
   module ClassMethods
-    def domain_mapped_attribute(association_name, association_klass, options = {})
+    def domain_mapped_attribute(association_name, association_class, options = {})
       name_field = options[:name_field] ||= "#{association_name}_name"
       options[:id_field] ||= "#{association_name}_id"
+      options[:association_class] ||= association_class
 
       # the before validator does the mapping
-      before_validation BeforeValidator.new(association_klass, options)
+      before_validation BeforeValidator.new(association_class, options)
       validates association_name, domain_presence: options
 
       # overwrite the reader for the name
@@ -27,7 +28,7 @@ module DomainMappedAttribute
 
         send(association_name).tap do |obj|
           return nil if obj.nil?
-          return nil if association_klass.unknown_domain_value?(obj.id)
+          return nil if association_class.unknown_domain_value?(obj.id)
 
           return obj.name
         end

@@ -19,11 +19,19 @@ ActiveRecord::Schema.define(version: 20160607172940) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "reviewers", force: :cascade do |t|
+    t.string   "username"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "reviews", force: :cascade do |t|
     t.string   "title"
     t.string   "body"
     t.integer  "restaurant_id"
     t.string   "restaurant_name"
+    t.integer  "reviewer_id"
+    t.string   "reviewed_by"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end

@@ -10,7 +10,8 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
     review = Review.new({
       title: "Great!",
       body: "This place is amazing!",
-      restaurant_name: "McDonald's"
+      restaurant_name: "McDonald's",
+      reviewed_by: "jeff"
     })
 
     assert review.save, review.errors.full_messages.to_sentence
@@ -18,12 +19,15 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
     mcd = restaurants(:mcd)
     assert_equal mcd.id, review.restaurant_id
     assert_equal "McDonald's", review.restaurant_name
+
+    jeff = reviewers(:jeff)
+    assert_equal jeff.id, review.reviewer_id
+    assert_equal "jeff", review.reviewed_by
   end
 
   def test_mapped_record_should_return_the_user_input_if_present
     review = reviews(:mapped_with_string)
     assert_equal "Some string", review.restaurant_name
-
   end
 
   def test_mapped_record_should_return_domain_value_if_user_input_is_missing
@@ -32,15 +36,37 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
   end
 
   def test_unresolvable
+    unknown = restaurants(:unknown)
     review = Review.new({
       title: "Great!",
       body: "This place is amazing!",
-      restaurant_name: "something unknown"
+      restaurant_name: "something unknown",
+      reviewed_by: "somebody"
     })
 
     assert review.save, review.errors.full_messages.to_sentence
 
-    assert_nil review.restaurant_id
+    assert_equal unknown.id, review.restaurant_id
     assert_equal "something unknown", review.restaurant_name
+
+    anon = reviewers(:anonymous)
+    assert_equal anon.id, review.reviewer_id
+    assert_equal "somebody", review.reviewed_by
+  end
+
+  def test_cannot_be_blank
+    unknown = restaurants(:unknown)
+    review = Review.new({
+      title: "Ok",
+      body: "Meh"
+    })
+
+    assert_equal false, review.save
+    assert review.errors[:restaurant_name].present?
+    assert_equal unknown.id, review.restaurant_id
+  end
+
+  def test_allowed_to_be_blank
+
   end
 end
