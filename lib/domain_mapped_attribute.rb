@@ -8,10 +8,6 @@ module DomainMappedAttribute
 
   extend ActiveSupport::Concern
 
-  included do
-    puts "included in AR::Base"
-  end
-
   module ClassMethods
     def domain_mapped_attribute(association_name, association_class, options = {})
       name_field = options[:name_field] ||= "#{association_name}_name"

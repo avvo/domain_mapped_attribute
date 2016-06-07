@@ -67,6 +67,16 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
   end
 
   def test_allowed_to_be_blank
+    review = Review.new({
+      title: "Great!",
+      body: "This place is amazing!",
+      restaurant_name: "something unknown"
+    })
 
+    assert review.save, review.errors.full_messages.to_sentence
+
+    anon = reviewers(:anonymous)
+    assert_equal anon.id, review.reviewer_id
+    assert_equal "somebody", review.reviewed_by
   end
 end
