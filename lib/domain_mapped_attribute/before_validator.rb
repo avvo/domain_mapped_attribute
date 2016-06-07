@@ -3,10 +3,10 @@ module DomainMappedAttribute
   class BeforeValidator
     attr_reader :name_field, :id_field
 
-    def initialize(association_name, association_klass)
+    def initialize(association_klass, options = {})
       @klass = association_klass
-      @name_field = "#{association_name}_name"
-      @id_field = "#{association_name}_id"
+      @name_field = options[:name_field]
+      @id_field = options[:id_field]
     end
 
     def before_validation(record)
@@ -15,7 +15,8 @@ module DomainMappedAttribute
       # if the id is unknown and we have a name, try to resolve it...
       return unless should_resolve?(record)
 
-      resolved_id = @klass.resolve(record.read_attribute(name_field), record.resolve_options)
+      resolve_options = record.respond_to?(:resolve_options) ? record.resolve_options : {}
+      resolved_id = @klass.resolve(record.read_attribute(name_field), resolve_options)
       set_id(record, resolved_id) if resolved_id.present?
     end
 

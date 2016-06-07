@@ -2,8 +2,6 @@ require "domain_mapped_attribute/version"
 
 module DomainMappedAttribute
   autoload :BeforeValidator, "domain_mapped_attribute/before_validator"
-  autoload :DomainMappable, "domain_mapped_attribute/domain_mappable"
-  autoload :Mapper, "domain_mapped_attribute/mapper"
   autoload :DomainPresenceValidator, "domain_mapped_attribute/domain_presence_validator"
   autoload :ResolveMethods, "domain_mapped_attribute/resolve_methods"
   autoload :Resolver, "domain_mapped_attribute/resolver"
@@ -21,13 +19,22 @@ module DomainMappedAttribute
 
   module ClassMethods
     def domain_mapped_attribute(association_name, association_klass, options = {})
-      # the before validator does the mapping
-      before_validation BeforeValidator.new(association_name, association_klass)
-      validates association_name, domain_presence: {allow_blank: !!options.delete(:allow_blank)}
+      name_field = options[:name_field] ||= "#{association_name}_name"
+      options[:id_field] ||= "#{association_name}_id"
 
-      unless method_defined?("resolve_options")
-        define_method("resolve_options") do
-          return {}
+      # the before validator does the mapping
+      before_validation BeforeValidator.new(association_klass, options)
+      validates association_name, domain_presence: options
+
+      # overwrite the reader for the name
+      define_method(name_field) do
+        return read_attribute(name_field) if attribute_present?(name_field)
+
+        send(association_name).tap do |obj|
+          return nil if obj.nil?
+          return nil if association_klass.unknown_domain_value?(obj.id)
+
+          return obj.name
         end
       end
     end

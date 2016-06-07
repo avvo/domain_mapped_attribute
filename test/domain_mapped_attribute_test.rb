@@ -30,4 +30,17 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
     review = reviews(:mapped_without_string)
     assert_equal "Burger King", review.restaurant_name
   end
+
+  def test_unresolvable
+    review = Review.new({
+      title: "Great!",
+      body: "This place is amazing!",
+      restaurant_name: "something unknown"
+    })
+
+    assert review.save, review.errors.full_messages.to_sentence
+
+    assert_nil review.restaurant_id
+    assert_equal "something unknown", review.restaurant_name
+  end
 end

@@ -3,8 +3,10 @@ module DomainMappedAttribute
   class DomainPresenceValidator < ActiveModel::EachValidator
 
     def validate_each(record, attribute, value)
-      name_field = "#{attribute}_name"
-      id_field = "#{attribute}_id"
+      return true if options[:allow_blank]
+
+      name_field = options.fetch(:name_field, "#{attribute}_name")
+      id_field = options.fetch(:id_field, "#{attribute}_id")
 
       # allow if record has name field set
       return true if record.read_attribute(name_field).present?
