@@ -1,4 +1,4 @@
-# DomainMappedAttribute
+# DomainMappedAttribute [![Build Status](https://travis-ci.org/avvo/domain_mapped_attribute.svg?branch=master)](https://travis-ci.org/avvo/domain_mapped_attribute)
 
 This gem is an `ActiveRecord` extension to let you map string fields to associated domain data tables.
 
