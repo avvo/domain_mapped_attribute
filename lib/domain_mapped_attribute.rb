@@ -3,7 +3,6 @@ require "domain_mapped_attribute/version"
 module DomainMappedAttribute
   autoload :BeforeValidator, "domain_mapped_attribute/before_validator"
   autoload :Configuration, "domain_mapped_attribute/configuration"
-  autoload :DomainMapper, "domain_mapped_attribute/domain_mapper"
   autoload :DomainPresenceValidator, "domain_mapped_attribute/domain_presence_validator"
   autoload :Mapping, "domain_mapped_attribute/mapping"
   autoload :Resolver, "domain_mapped_attribute/resolver"
@@ -36,11 +35,16 @@ module DomainMappedAttribute
     end
 
     def domain_mappable(name_field, options = {})
-      cattr_accessor :domain_mapper
-      self.domain_mapper = DomainMapper.new(name_field, options.merge(klass: self))
+      cattr_accessor :domain_resolver
+      resolver_class = options.fetch(:resolver_class, Resolver)
+      self.domain_resolver = resolver_class.new({
+        name_field: name_field,
+        options: options,
+        domain_class: self
+      })
 
       class << self
-        delegate :resolve, to: :domain_mapper
+        delegate :resolve, to: :domain_resolver
 
         def unknown_domain_id
           const_defined?(:UNKNOWN) ? const_get(:UNKNOWN) : nil
