@@ -19,8 +19,8 @@ module DomainMappedAttribute
 
       # allow if there is a mapped value that is not "unknown"
       domain_id = record.read_attribute(id_field)
-      association_class = attribute.association_class
-      return true if domain_id.present? && !association_class.unknown_domain_value?(domain_id)
+      domain_class = attribute.domain_class
+      return true if domain_id.present? && !domain_class.unknown_domain_value?(domain_id)
 
       # the id value is "unknown" and the name field is blank
       record.errors.add(name_field, :blank)

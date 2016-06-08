@@ -14,8 +14,8 @@ module DomainMappedAttribute
       @domain_mapped_attribute_config ||= Configuration.new
     end
 
-    def domain_mapped_attribute(association_name, association_class, options = {})
-      attribute = domain_mapped_attribute_config.add_attribute(association_name, association_class, options)
+    def domain_mapped_attribute(association_name, domain_class, options = {})
+      attribute = domain_mapped_attribute_config.add_attribute(association_name, domain_class, options)
       name_field = attribute.name_field
 
       # use a mixin to only run stuff once
@@ -27,7 +27,7 @@ module DomainMappedAttribute
 
         send(association_name).tap do |obj|
           return nil if obj.nil?
-          return nil if association_class.unknown_domain_value?(obj.id)
+          return nil if domain_class.unknown_domain_value?(obj.id)
 
           return obj.name
         end

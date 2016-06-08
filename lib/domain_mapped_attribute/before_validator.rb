@@ -1,7 +1,7 @@
 module DomainMappedAttribute
 
   class BeforeValidator
-    delegate :name_field, :id_field, :association_class, to: :@attribute
+    delegate :name_field, :id_field, :domain_class, to: :@attribute
 
     def self.before_validation(record)
       record.class.domain_mapped_attribute_config.each do |_, attribute|
@@ -20,7 +20,7 @@ module DomainMappedAttribute
       return unless should_resolve?(record)
 
       resolve_options = record.respond_to?(:resolve_options) ? record.resolve_options : {}
-      resolved_id = association_class.resolve(record.read_attribute(name_field), resolve_options)
+      resolved_id = domain_class.resolve(record.read_attribute(name_field), resolve_options)
       set_id(record, resolved_id) if resolved_id.present?
     end
 
@@ -36,12 +36,12 @@ module DomainMappedAttribute
     end
 
     def should_resolve?(record)
-      association_class.unknown_domain_value?(record.read_attribute(id_field)) &&
+      domain_class.unknown_domain_value?(record.read_attribute(id_field)) &&
         record.attribute_present?(name_field)
     end
 
     def reset_id_field(record)
-      set_id(record, association_class.unknown_domain_id)
+      set_id(record, domain_class.unknown_domain_id)
     end
 
     def set_id(record, value)
