@@ -77,6 +77,6 @@ class DomainMappedAttributeTest < ActiveSupport::TestCase
 
     anon = reviewers(:anonymous)
     assert_equal anon.id, review.reviewer_id
-    assert_equal "somebody", review.reviewed_by
+    assert_nil review.reviewed_by
   end
 end
