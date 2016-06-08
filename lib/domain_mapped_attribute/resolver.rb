@@ -1,19 +1,33 @@
 module DomainMappedAttribute
 
   class Resolver
+    attr_reader :options
     def initialize(options = {})
-      @name_field = options[:name_field]
-      @klass = options[:klass]
+      @options = options
     end
 
-    def resolve(name, options = {})
-      conditions = options.select{|k,v| @klass.column_names.include?(k.to_s)}
-      matches = @klass.where(@name_field => name).where(conditions)
-      if matches.length > 0
-        return matches[0].id
+    def resolve(name, query = {})
+      conditions = query.select{|k,v| domain_class.column_names.include?(k.to_s)}
+      matches = domain_class.where(name_field => name).where(conditions).to_a
+      if matches.present?
+        return matches.first.id
       else
-        return @klass.unknown_domain_id
+        return unknown_domain_id
       end
+    end
+
+    protected
+
+    def name_field
+      options.fetch(:name_field)
+    end
+
+    def domain_class
+      options.fetch(:klass)
+    end
+
+    def unknown_domain_id
+      domain_class.unknown_domain_id
     end
   end
 

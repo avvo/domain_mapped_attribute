@@ -1,5 +1,5 @@
 require "domain_mapped_attribute/version"
-
+puts "in domain mapped attribute"
 module DomainMappedAttribute
   autoload :BeforeValidator, "domain_mapped_attribute/before_validator"
   autoload :DomainMapper, "domain_mapped_attribute/domain_mapper"
@@ -52,5 +52,6 @@ module DomainMappedAttribute
   end
 end
 
-# require "domain_presence_validator"
-require "domain_mapped_attribute/railtie" if defined?(Rails)
+ActiveSupport.on_load(:active_record) do
+  include ::DomainMappedAttribute
+end
