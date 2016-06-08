@@ -1,5 +1,5 @@
 require "domain_mapped_attribute/version"
-puts "in domain mapped attribute"
+
 module DomainMappedAttribute
   autoload :BeforeValidator, "domain_mapped_attribute/before_validator"
   autoload :DomainMapper, "domain_mapped_attribute/domain_mapper"
