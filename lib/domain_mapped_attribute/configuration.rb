@@ -1,7 +1,7 @@
 module DomainMappedAttribute
   class Configuration
     Attribute = Struct.new(:id_field, :name_field, :domain_class, :domain_name_field, :allow_blank)
-    delegate :each, to: :@attributes
+    delegate :each, :[], to: :@attributes
 
     def initialize
       @attributes = {}
