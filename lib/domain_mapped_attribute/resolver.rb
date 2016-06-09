@@ -1,10 +1,6 @@
 module DomainMappedAttribute
 
-  class Resolver
-    attr_reader :options
-    def initialize(options = {})
-      @options = options
-    end
+  class Resolver < Struct.new(:options)
 
     def resolve(name, query = {})
       conditions = query.select{|k,v| domain_class.column_names.include?(k.to_s)}
@@ -23,7 +19,7 @@ module DomainMappedAttribute
     end
 
     def domain_class
-      options.fetch(:klass)
+      options.fetch(:domain_class)
     end
 
     def unknown_domain_id
